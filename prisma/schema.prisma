@@ -1,9 +1,244 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model Circuit {
+  circuitId  Int     @id @default(autoincrement())
+  circuitRef String  @default("")
+  name       String  @default("")
+  location   String?
+  country    String?
+  lat        Float?
+  lng        Float?
+  alt        Int?
+  url        String  @unique(map: "sqlite_autoindex_circuits_1") @default("")
+  races      Race[]
+
+  @@map("circuits")
 }
 
+model ConstructorResult {
+  constructorResultsId Int         @id @default(autoincrement())
+  raceId               Int         @default(0)
+  constructorId        Int         @default(0)
+  points               Float?
+  status               String?
+  races                Race        @relation(fields: [raceId], references: [raceId], onDelete: NoAction, onUpdate: NoAction)
+  constructors         Constructor @relation(fields: [constructorId], references: [constructorId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("constructor_results")
+}
+
+model ConstructorStanding {
+  constructorStandingsId Int         @id @default(autoincrement())
+  raceId                 Int         @default(0)
+  constructorId          Int         @default(0)
+  points                 Float       @default(0)
+  position               Int?
+  positionText           String?
+  wins                   Int         @default(0)
+  races                  Race        @relation(fields: [raceId], references: [raceId], onDelete: NoAction, onUpdate: NoAction)
+  constructors           Constructor @relation(fields: [constructorId], references: [constructorId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("constructor_standings")
+}
+
+model Constructor {
+  constructorId         Int                   @id @default(autoincrement())
+  constructorRef        String                @default("")
+  name                  String                @unique(map: "sqlite_autoindex_constructors_1") @default("")
+  nationality           String?
+  url                   String                @default("")
+  constructor_results   ConstructorResult[]
+  constructor_standings ConstructorStanding[]
+  qualifying            Qualifying[]
+  results               Result[]
+  sprint_results        SprintResult[]
+
+  @@map("constructors")
+}
+
+model DriverStanding {
+  driverStandingsId Int     @id @default(autoincrement())
+  raceId            Int     @default(0)
+  driverId          Int     @default(0)
+  points            Float   @default(0)
+  position          Int?
+  positionText      String?
+  wins              Int     @default(0)
+  races             Race    @relation(fields: [raceId], references: [raceId], onDelete: NoAction, onUpdate: NoAction)
+  drivers           Driver  @relation(fields: [driverId], references: [driverId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("driver_standings")
+}
+
+model Driver {
+  driverId         Int              @id @default(autoincrement())
+  driverRef        String           @default("")
+  number           Int?
+  code             String?
+  forename         String           @default("")
+  surname          String           @default("")
+  dob              String?
+  nationality      String?
+  url              String           @unique(map: "sqlite_autoindex_drivers_1") @default("")
+  driver_standings DriverStanding[]
+  lap_times        LapTime[]
+  pit_stops        PitStop[]
+  qualifying       Qualifying[]
+  results          Result[]
+  sprint_results   SprintResult[]
+
+  @@map("drivers")
+}
+
+model LapTime {
+  raceId       Int
+  driverId     Int
+  lap          Int
+  position     Int?
+  time         String?
+  milliseconds Int?
+  races        Race    @relation(fields: [raceId], references: [raceId], onDelete: NoAction, onUpdate: NoAction)
+  drivers      Driver  @relation(fields: [driverId], references: [driverId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([raceId, driverId, lap])
+  @@map("lap_times")
+}
+
+model PitStop {
+  raceId       Int
+  driverId     Int
+  stop         Int
+  lap          Int
+  time         String
+  duration     String?
+  milliseconds Int?
+  races        Race    @relation(fields: [raceId], references: [raceId], onDelete: NoAction, onUpdate: NoAction)
+  drivers      Driver  @relation(fields: [driverId], references: [driverId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([raceId, driverId, stop])
+  @@map("pit_stops")
+}
+
+model Qualifying {
+  qualifyId     Int         @id @default(autoincrement())
+  raceId        Int         @default(0)
+  driverId      Int         @default(0)
+  constructorId Int         @default(0)
+  number        Int         @default(0)
+  position      Int?
+  q1            String?
+  q2            String?
+  q3            String?
+  races         Race        @relation(fields: [raceId], references: [raceId], onDelete: NoAction, onUpdate: NoAction)
+  drivers       Driver      @relation(fields: [driverId], references: [driverId], onDelete: NoAction, onUpdate: NoAction)
+  constructors  Constructor @relation(fields: [constructorId], references: [constructorId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("qualifying")
+}
+
+model Race {
+  raceId                Int                   @id @default(autoincrement())
+  year                  Int                   @default(0)
+  round                 Int                   @default(0)
+  circuitId             Int                   @default(0)
+  name                  String                @default("")
+  date                  String                @default("0000-00-00")
+  time                  String?
+  url                   String?               @unique(map: "sqlite_autoindex_races_1")
+  fp1_date              String?
+  fp1_time              String?
+  fp2_date              String?
+  fp2_time              String?
+  fp3_date              String?
+  fp3_time              String?
+  quali_date            String?
+  quali_time            String?
+  sprint_date           String?
+  sprint_time           String?
+  constructor_results   ConstructorResult[]
+  constructor_standings ConstructorStanding[]
+  driver_standings      DriverStanding[]
+  lap_times             LapTime[]
+  pit_stops             PitStop[]
+  qualifying            Qualifying[]
+  circuits              Circuit               @relation(fields: [circuitId], references: [circuitId], onDelete: NoAction, onUpdate: NoAction)
+  results               Result[]
+  sprint_results        SprintResult[]
+
+  @@map("races")
+}
+
+model Result {
+  resultId        Int         @id @default(autoincrement())
+  raceId          Int         @default(0)
+  driverId        Int         @default(0)
+  constructorId   Int         @default(0)
+  number          Int?
+  grid            Int         @default(0)
+  position        Int?
+  positionText    String      @default("")
+  positionOrder   Int         @default(0)
+  points          Float       @default(0)
+  laps            Int         @default(0)
+  time            String?
+  milliseconds    Int?
+  fastestLap      Int?
+  rank            Int?        @default(0)
+  fastestLapTime  String?
+  fastestLapSpeed String?
+  statusId        Int         @default(0)
+  status          Status      @relation(fields: [statusId], references: [statusId], onDelete: NoAction, onUpdate: NoAction)
+  races           Race        @relation(fields: [raceId], references: [raceId], onDelete: NoAction, onUpdate: NoAction)
+  drivers         Driver      @relation(fields: [driverId], references: [driverId], onDelete: NoAction, onUpdate: NoAction)
+  constructors    Constructor @relation(fields: [constructorId], references: [constructorId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("results")
+}
+
+model Season {
+  year Int    @id @default(autoincrement())
+  url  String @unique(map: "sqlite_autoindex_seasons_1") @default("")
+
+  @@map("seasons")
+}
+
+model SprintResult {
+  sprintResultId Int         @id @default(autoincrement())
+  raceId         Int         @default(0)
+  driverId       Int         @default(0)
+  constructorId  Int         @default(0)
+  number         Int         @default(0)
+  grid           Int         @default(0)
+  position       Int?
+  positionText   String      @default("")
+  positionOrder  Int         @default(0)
+  points         Float       @default(0)
+  laps           Int         @default(0)
+  time           String?
+  milliseconds   Int?
+  fastestLap     Int?
+  fastestLapTime String?
+  statusId       Int         @default(0)
+  status         Status      @relation(fields: [statusId], references: [statusId], onDelete: NoAction, onUpdate: NoAction)
+  races          Race        @relation(fields: [raceId], references: [raceId], onDelete: NoAction, onUpdate: NoAction)
+  drivers        Driver      @relation(fields: [driverId], references: [driverId], onDelete: NoAction, onUpdate: NoAction)
+  constructors   Constructor @relation(fields: [constructorId], references: [constructorId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("sprint_results")
+}
+
+model Status {
+  statusId       Int            @id @default(autoincrement())
+  status         String         @default("")
+  results        Result[]
+  sprint_results SprintResult[]
+
+  @@map("status")
+}
