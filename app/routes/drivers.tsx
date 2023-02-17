@@ -4,7 +4,21 @@ import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 import { prisma } from "~/db.server";
 
 export async function loader({ request }: LoaderArgs) {
-  const drivers = await prisma.driver.findMany({ take: 10 });
+  const drivers = await prisma.driver.findMany({
+    select: {
+      driverId: true,
+      driverRef: true,
+      surname: true,
+      forename: true,
+      number: true,
+      code: true,
+    },
+    take: 50,
+    orderBy: {
+      driverId: 'asc'
+    }
+  });
+
   return json({ drivers });
 }
 
@@ -22,8 +36,11 @@ export default function DriversPage() {
       <main className="flex h-full bg-white">
         <ul>
           {data.drivers.map(driver => {
-            return <li key={driver.code}>
-              <span>{driver.number}: {driver.forename} {driver.surname}</span>
+            return <li key={driver.driverRef}>
+              <Link to={driver.driverId.toString()}>
+                <span>{driver.forename} {driver.surname}</span>
+                {driver.code ? <span> {driver.code} </span> : null}
+              </Link>
             </li>
           })}
         </ul>
