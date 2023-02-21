@@ -11,7 +11,15 @@ export async function loader({ request, params }: LoaderArgs) {
   if (!driver) {
     throw new Response("Driver not found.", { status: 404 })
   }
-  return json({ driver });
+
+  const polePositions = await prisma.qualifying.count({
+    where: {
+      driverId,
+      position: 1,
+    },
+  });
+
+  return json({ driver, polePositions });
 }
 
 export default function DriverDetailsPage() {
@@ -29,6 +37,8 @@ export default function DriverDetailsPage() {
         ) : <dd></dd>}
         <dt>Wikipedia</dt>
         <dd><a href={driver.url} target="_blank" referrerPolicy="no-referrer">{driver.url}</a></dd>
+        <dt>Pole Positions</dt>
+        <dd>{data.polePositions}</dd>
       </dl>
       <div>
         <pre>
