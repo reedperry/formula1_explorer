@@ -19,7 +19,14 @@ export async function loader({ request, params }: LoaderArgs) {
     },
   });
 
-  return json({ driver, polePositions });
+  const wins = await prisma.result.count({
+    where: {
+      driverId,
+      positionText: '1'
+    }
+  });
+
+  return json({ driver, polePositions, wins });
 }
 
 export default function DriverDetailsPage() {
@@ -39,6 +46,8 @@ export default function DriverDetailsPage() {
         <dd><a href={driver.url} target="_blank" referrerPolicy="no-referrer">{driver.url}</a></dd>
         <dt>Pole Positions</dt>
         <dd>{data.polePositions}</dd>
+        <dt>Race Wins</dt>
+        <dd>{data.wins}</dd>
       </dl>
       <div>
         <pre>
