@@ -1,5 +1,4 @@
 import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
-// import { json } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -10,6 +9,7 @@ import {
 } from "@remix-run/react";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
+import Sidebar from "./components/Sidebar";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
@@ -21,9 +21,6 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-// export async function loader({ request }: LoaderArgs) {
-//   return json({});
-// }
 
 export default function App() {
   return (
@@ -33,7 +30,8 @@ export default function App() {
         <Links />
         <title>Formula One</title>
       </head>
-      <body className="h-full">
+      <body className="h-full w-full min-h-screen flex">
+        <Sidebar />
         <Outlet />
         <ScrollRestoration />
         <Scripts />

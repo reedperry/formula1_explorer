@@ -26,7 +26,7 @@ export default function DriversPage() {
   const data = useLoaderData<typeof loader>();
 
   return (
-    <div className="flex h-full min-h-screen flex-col">
+    <div className="flex h-full w-full min-h-screen flex-col max-w-screen-lg">
       <header className="flex items-center justify-between bg-slate-800 p-4 text-white">
         <h1 className="text-3xl font-bold">
           <Link to=".">Drivers</Link>

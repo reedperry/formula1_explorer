@@ -23,6 +23,7 @@ export async function loader({ request }: LoaderArgs) {
         },
         take: 1,
         select: {
+          raceId: true,
           date: true,
           results: {
             where: {
@@ -48,7 +49,7 @@ export default function CircuitsPage() {
   const data = useLoaderData<typeof loader>();
 
   return (
-    <div className="flex h-full min-h-screen flex-col">
+    <div className="flex h-full w-full min-h-screen flex-col max-w-screen-lg">
       <header className="flex items-center justify-between bg-slate-800 p-4 text-white">
         <h1 className="text-3xl font-bold">
           <Link to=".">Circuits</Link>
@@ -63,7 +64,7 @@ export default function CircuitsPage() {
                 <span>{circuit.name} ({circuit.country})</span>
               </Link>
               <div>{circuit.races.map(r =>
-                <small>Winner on {r.date} - {r.results[0].drivers.surname}</small>
+                <small key={r.raceId}>Winner on {r.date} - {r.results[0].drivers.surname}</small>
               )}</div>
             </li>
           })}
