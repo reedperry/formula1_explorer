@@ -9,6 +9,9 @@ export default function Sidebar() {
           <Link to="drivers">Drivers</Link>
         </li>
         <li>
+          <Link to="constructors">Constructors</Link>
+        </li>
+        <li>
           <Link to="circuits">Circuits</Link>
         </li>
       </ul>
