@@ -3,12 +3,15 @@ import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
 
+// TODO Add drivers for team
+
 export async function loader({ request, params }: LoaderArgs) {
   invariant(params.constructorId, "constructorId not found");
   const constructorId = Number.parseInt(params.constructorId);
   const constructor = await prisma.constructor.findFirst({
     where: { constructorId },
   });
+
   const standings = await prisma.constructorStanding.findMany({
     take: 1,
     orderBy: {
@@ -37,11 +40,11 @@ export default function ConstructorDetailsPage() {
 
   return (
     <div>
-      <h1>{constructor.name}</h1>
-      <p>2022 Constructor's Championship Standing: {finalStanding2022.positionText} ({finalStanding2022.points} points)</p>
+      <h1 className="text-2xl mb-4">{constructor.name}</h1>
+      {finalStanding2022 ? (<p>2022 Constructor's Championship Standing: {finalStanding2022.positionText} ({finalStanding2022.points} points)</p>) : null}
       <div>
         <a href={constructor.url} target="_blank" referrerPolicy="no-referrer">
-          Wikipedia
+          Visit {constructor.name}'s page on Wikipedia
         </a>
       </div>
     </div>

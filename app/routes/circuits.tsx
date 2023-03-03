@@ -4,45 +4,30 @@ import { json } from "@remix-run/node";
 import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 import { prisma } from "~/db.server";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader() {
   const circuits = await prisma.circuit.findMany({
     select: {
       circuitId: true,
       circuitRef: true,
-      alt: true,
       country: true,
-      location: true,
       name: true,
-      url: true,
-      races: {
-        where: {
-          year: 2022
-        },
-        orderBy: {
-          date: 'desc'
-        },
-        take: 1,
-        select: {
-          raceId: true,
-          date: true,
-          results: {
-            where: {
-              positionText: "1"
-            },
-            include: {
-              drivers: true
-            }
-          }
-        }
-
-      }
-    },
-    orderBy: {
-      name: 'asc'
-    },
+    }
   });
 
-  return json({ circuits });
+  const raceCircuitsThisYear = await prisma.race.findMany({
+    select: {
+      circuitId: true
+    },
+    where: {
+      year: 2023
+    }
+  });
+
+  const activeCircuitIds = raceCircuitsThisYear.map(circuit => circuit.circuitId);
+  const activeCircuits = circuits.filter(circuit => activeCircuitIds.includes(circuit.circuitId));
+  const inactiveCircuits = circuits.filter(circuit => !activeCircuitIds.includes(circuit.circuitId));
+
+  return json({ activeCircuits, inactiveCircuits });
 }
 
 export default function CircuitsPage() {
@@ -56,19 +41,31 @@ export default function CircuitsPage() {
         </h1>
       </header>
 
-      <main className="flex h-full bg-white">
-        <ul>
-          {data.circuits.map(circuit => {
-            return <li key={circuit.circuitRef}>
-              <Link to={circuit.circuitId.toString()}>
-                <span>{circuit.name} ({circuit.country})</span>
-              </Link>
-              <div>{circuit.races.map(r =>
-                <small key={r.raceId}>Winner on {r.date} - {r.results[0].drivers.surname}</small>
-              )}</div>
-            </li>
-          })}
-        </ul>
+      <main className="flex h-full bg-white ml-4">
+        <div className="flex-col">
+          <h2 className="text-lg font-bold mt-4">Active Circuits</h2>
+          <ul>
+            {data.activeCircuits.map(circuit => {
+              return <li className="my-1" key={circuit.circuitRef}>
+                <Link to={circuit.circuitId.toString()}>
+                  <span className="hover:font-bold">{circuit.name} ({circuit.country})</span>
+                </Link>
+              </li>
+            })}
+          </ul>
+          <details>
+            <summary className="text-lg font-bold mt-4">Inactive Circuits</summary>
+            <ul>
+              {data.inactiveCircuits.map(circuit => {
+                return <li className="my-1" key={circuit.circuitRef}>
+                  <Link to={circuit.circuitId.toString()}>
+                    <span className="hover:font-bold">{circuit.name} ({circuit.country})</span>
+                  </Link>
+                </li>
+              })}
+            </ul>
+          </details>
+        </div>
         <div className="flex-1 p-6">
           <Outlet />
         </div>

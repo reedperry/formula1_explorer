@@ -4,7 +4,44 @@ import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 import { prisma } from "~/db.server";
 
 export async function loader({ request }: LoaderArgs) {
-  const drivers = await prisma.driver.findMany({
+  const activeDriverStandings = await prisma.driverStanding.findMany({
+    distinct: ['driverId'],
+    select: {
+      drivers: {
+        select: {
+          driverId: true,
+          driverRef: true,
+          surname: true,
+          forename: true,
+          number: true,
+          code: true,
+        }
+      }
+    },
+    orderBy: {
+      drivers: {
+        surname: 'asc'
+      }
+    },
+    where: {
+      races: {
+        year: 2023
+      }
+    }
+  });
+
+  const activeDrivers = activeDriverStandings.map(standing => standing.drivers);
+  const activeDriverIds = activeDrivers.map(driver => driver.driverId);
+
+  const inactiveDrivers = await prisma.driver.findMany({
+    take: 3,
+    where: {
+      NOT: {
+        driverId: {
+          in: activeDriverIds
+        }
+      }
+    },
     select: {
       driverId: true,
       driverRef: true,
@@ -13,13 +50,13 @@ export async function loader({ request }: LoaderArgs) {
       number: true,
       code: true,
     },
-    take: 50,
     orderBy: {
-      driverId: 'asc'
+      surname: 'asc'
     }
   });
 
-  return json({ drivers });
+
+  return json({ inactiveDrivers, activeDrivers });
 }
 
 export default function DriversPage() {
@@ -33,17 +70,33 @@ export default function DriversPage() {
         </h1>
       </header>
 
-      <main className="flex h-full bg-white">
-        <ul>
-          {data.drivers.map(driver => {
-            return <li key={driver.driverRef}>
-              <Link to={driver.driverId.toString()}>
-                <span>{driver.forename} {driver.surname}</span>
-                {driver.code ? <span> {driver.code} </span> : null}
-              </Link>
-            </li>
-          })}
-        </ul>
+      <main className="flex h-full bg-white ml-4">
+        <div className="flex-col">
+          <h2 className="text-lg font-bold mt-4">Active Drivers</h2>
+          <ul>
+            {data.activeDrivers.map(driver => {
+              return <li className="my-1 hover:font-bold" key={driver.driverRef}>
+                <Link to={driver.driverId.toString()}>
+                  <span>{driver.forename} {driver.surname}</span>
+                  {driver.code ? <small> {driver.code} </small> : null}
+                </Link>
+              </li>
+            })}
+          </ul>
+          <details>
+            <summary className="text-lg font-bold mt-4">Inactive Drivers</summary>
+            <ul>
+              {data.inactiveDrivers.map(driver => {
+                return <li className="my-1 hover:font-bold" key={driver.driverRef}>
+                  <Link to={driver.driverId.toString()}>
+                    <span>{driver.forename} {driver.surname}</span>
+                    {driver.code ? <small> {driver.code} </small> : null}
+                  </Link>
+                </li>
+              })}
+            </ul>
+          </details>
+        </div>
         <div className="flex-1 p-6">
           <Outlet />
         </div>
