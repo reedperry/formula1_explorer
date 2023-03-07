@@ -1,16 +1,23 @@
 
-import type { ActionArgs, LoaderArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, Link, useCatch, useLoaderData } from "@remix-run/react";
+import type { LoaderArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Link, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
+import { alignCountryName, getCountryCodeForCountryName } from "~/helpers/country-mapping";
 
 export async function loader({ request, params }: LoaderArgs) {
   invariant(params.circuitId, "circuitId not found");
   const circuitId = Number.parseInt(params.circuitId);
   const circuit = await prisma.circuit.findFirst({
     where: { circuitId }
-  })
+  });
+  if (!circuit) {
+    throw new Response("Circuit not found.", { status: 404 })
+  }
+
+  circuit.country = alignCountryName(circuit.country);
+  const countryCode = getCountryCodeForCountryName(circuit.country);
 
   const circuitWinnerResults = await prisma.result.findMany({
     select: {
@@ -45,10 +52,7 @@ export async function loader({ request, params }: LoaderArgs) {
     year: result.races.year
   }));
 
-  if (!circuit) {
-    throw new Response("Circuit not found.", { status: 404 })
-  }
-  return json({ circuit, raceWins });
+  return json({ circuit, raceWins, countryCode });
 }
 
 export default function CircuitDetailsPage() {
@@ -59,7 +63,10 @@ export default function CircuitDetailsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl mb-4">{circuit.name} - {circuit.country}</h1>
+      <h1 className="text-2xl mb-4">{circuit.name}</h1>
+      <h2 className="text-xl mb-3">
+        {circuit.location}, {circuit.country}<CountryFlag countryCode={data.countryCode} />
+      </h2>
       <div>
         <a href={circuit.url} target="_blank" referrerPolicy="no-referrer">
           Visit {circuit.name}'s page on Wikipedia
@@ -68,7 +75,7 @@ export default function CircuitDetailsPage() {
       <h2 className="font-bold mt-4">Previous Winners</h2>
       <ul>
         {lastFiveWinners.map(win => (
-          <li className="my-1"><Link to={`/drivers/${win.driver.driverId}`}>{win.driver.forename} {win.driver.surname}</Link> ({win.year})</li>
+          <li className="my-1" key={win.year}><Link to={`/drivers/${win.driver.driverId}`}>{win.driver.forename} {win.driver.surname}</Link> ({win.year})</li>
         ))}
         {olderWinners.length ? (
           <details><summary>Show More...</summary>
@@ -80,6 +87,10 @@ export default function CircuitDetailsPage() {
       </ul>
     </div>
   );
+}
+
+function CountryFlag(props: { countryCode: string }) {
+  return props.countryCode ? <img className="inline h-10 ml-4 shadow" src={`/images/flags/${props.countryCode}.png`}></img> : null;
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
@@ -97,3 +108,4 @@ export function CatchBoundary() {
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
 }
+

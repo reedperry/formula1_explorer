@@ -1,6 +1,6 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { prisma } from "~/db.server";
 
 export async function loader({ request }: LoaderArgs) {
@@ -34,7 +34,6 @@ export async function loader({ request }: LoaderArgs) {
   const activeDriverIds = activeDrivers.map(driver => driver.driverId);
 
   const inactiveDrivers = await prisma.driver.findMany({
-    take: 3,
     where: {
       NOT: {
         driverId: {

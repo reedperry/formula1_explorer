@@ -49,7 +49,7 @@ export default function DriverDetailsPage() {
           </tr>
           {driver.nationality && (<tr>
             <td className="p-3 border border-slate-700">Nationality</td>
-            <td className="p-3 border border-slate-700">{ /*<CountryFlag nationality={driver.nationality} /> */}{driver.nationality}</td>
+            <td className="p-3 border border-slate-700">{driver.nationality}</td>
           </tr>)}
           <tr>
             <td className="p-3 border border-slate-700">Pole Positions</td>
@@ -64,10 +64,6 @@ export default function DriverDetailsPage() {
       <a href={driver.url} target="_blank" referrerPolicy="no-referrer">Visit {driver.forename} {driver.surname}'s page on Wikipedia</a>
     </div>
   );
-}
-
-function CountryFlag(props: { nationality: string }) {
-  return props.nationality ? <img className="h-8" src="/images/..."></img> : null;
 }
 
 function findDriverDOB(utcDob: string): Date | null {
