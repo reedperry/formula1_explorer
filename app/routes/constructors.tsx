@@ -1,6 +1,6 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { Link, Outlet, useLoaderData } from '@remix-run/react';
+import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react';
 import Sidebar from '~/components/Sidebar';
 import { prisma } from '~/db.server';
 
@@ -68,9 +68,14 @@ export default function ConstructorsPage() {
               {data.activeConstructors.map(constructor => {
                 return (
                   <li className="my-1 hover:font-bold" key={constructor.name}>
-                    <Link to={constructor.constructorId.toString()}>
+                    <NavLink
+                      to={constructor.constructorId.toString()}
+                      className={({ isActive }) =>
+                        isActive ? 'font-bold' : undefined
+                      }
+                    >
                       <span>{constructor.name}</span>
-                    </Link>
+                    </NavLink>
                   </li>
                 );
               })}
@@ -83,9 +88,14 @@ export default function ConstructorsPage() {
                 {data.inactiveConstructors.map(constructor => {
                   return (
                     <li className="my-1 hover:font-bold" key={constructor.name}>
-                      <Link to={constructor.constructorId.toString()}>
+                      <NavLink
+                        to={constructor.constructorId.toString()}
+                        className={({ isActive }) =>
+                          isActive ? 'font-bold' : undefined
+                        }
+                      >
                         <span>{constructor.name}</span>
-                      </Link>
+                      </NavLink>
                     </li>
                   );
                 })}

@@ -55,11 +55,16 @@ export default function CircuitsPage() {
               {data.activeCircuits.map(circuit => {
                 return (
                   <li className="my-1" key={circuit.circuitRef}>
-                    <Link to={circuit.circuitId.toString()}>
+                    <NavLink
+                      to={circuit.circuitId.toString()}
+                      className={({ isActive }) =>
+                        isActive ? 'font-bold' : undefined
+                      }
+                    >
                       <span className="hover:font-bold">
                         {circuit.name} ({circuit.country})
                       </span>
-                    </Link>
+                    </NavLink>
                   </li>
                 );
               })}
@@ -72,11 +77,16 @@ export default function CircuitsPage() {
                 {data.inactiveCircuits.map(circuit => {
                   return (
                     <li className="my-1" key={circuit.circuitRef}>
-                      <Link to={circuit.circuitId.toString()}>
+                      <NavLink
+                        to={circuit.circuitId.toString()}
+                        className={({ isActive }) =>
+                          isActive ? 'font-bold' : undefined
+                        }
+                      >
                         <span className="hover:font-bold">
                           {circuit.name} ({circuit.country})
                         </span>
-                      </Link>
+                      </NavLink>
                     </li>
                   );
                 })}

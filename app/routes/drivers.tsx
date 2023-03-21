@@ -1,6 +1,6 @@
 import type { LoaderArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { Link, Outlet, useLoaderData } from '@remix-run/react';
+import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react';
 import Sidebar from '~/components/Sidebar';
 import { prisma } from '~/db.server';
 
@@ -77,12 +77,17 @@ export default function DriversPage() {
               {data.activeDrivers.map(driver => {
                 return (
                   <li className="my-1 hover:font-bold" key={driver.driverRef}>
-                    <Link to={driver.driverId.toString()}>
+                    <NavLink
+                      to={driver.driverId.toString()}
+                      className={({ isActive }) =>
+                        isActive ? 'font-bold' : undefined
+                      }
+                    >
                       <span>
                         {driver.forename} {driver.surname}
                       </span>
                       {driver.code ? <small> {driver.code} </small> : null}
-                    </Link>
+                    </NavLink>
                   </li>
                 );
               })}
@@ -95,12 +100,17 @@ export default function DriversPage() {
                 {data.inactiveDrivers.map(driver => {
                   return (
                     <li className="my-1 hover:font-bold" key={driver.driverRef}>
-                      <Link to={driver.driverId.toString()}>
+                      <NavLink
+                        to={driver.driverId.toString()}
+                        className={({ isActive }) =>
+                          isActive ? 'font-bold' : undefined
+                        }
+                      >
                         <span>
                           {driver.forename} {driver.surname}
                         </span>
                         {driver.code ? <small> {driver.code} </small> : null}
-                      </Link>
+                      </NavLink>
                     </li>
                   );
                 })}
