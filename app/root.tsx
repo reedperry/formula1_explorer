@@ -10,6 +10,7 @@ import {
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import Sidebar from "./components/Sidebar";
+import { Navbar } from "./components/Navbar";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
@@ -21,7 +22,6 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-
 export default function App() {
   return (
     <html lang="en" className="h-full">
@@ -30,8 +30,8 @@ export default function App() {
         <Links />
         <title>Formula One</title>
       </head>
-      <body className="h-full w-full min-h-screen flex">
-        <Sidebar />
+      <body className="h-full min-h-screen w-full flex-col">
+        <Navbar />
         <Outlet />
         <ScrollRestoration />
         <Scripts />
