@@ -1,13 +1,13 @@
-import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
-import Sidebar from "~/components/Sidebar";
-import { prisma } from "~/db.server";
+import type { LoaderArgs } from '@remix-run/node';
+import { json } from '@remix-run/node';
+import { Link, Outlet, useLoaderData } from '@remix-run/react';
+import Sidebar from '~/components/Sidebar';
+import { prisma } from '~/db.server';
 
 export async function loader({ request }: LoaderArgs) {
   const activeConstructorsStandings = await prisma.constructorStanding.findMany(
     {
-      distinct: ["constructorId"],
+      distinct: ['constructorId'],
       select: {
         constructors: {
           select: {
@@ -25,11 +25,9 @@ export async function loader({ request }: LoaderArgs) {
   );
 
   const activeConstructors = activeConstructorsStandings.map(
-    (result) => result.constructors
+    result => result.constructors
   );
-  const activeConstructorIds = activeConstructors.map(
-    (ctr) => ctr.constructorId
-  );
+  const activeConstructorIds = activeConstructors.map(ctr => ctr.constructorId);
 
   const inactiveConstructors = await prisma.constructor.findMany({
     where: {
@@ -44,7 +42,7 @@ export async function loader({ request }: LoaderArgs) {
       name: true,
     },
     orderBy: {
-      name: "asc",
+      name: 'asc',
     },
   });
 
@@ -67,7 +65,7 @@ export default function ConstructorsPage() {
           <div className="flex-col">
             <h2 className="mt-4 text-lg font-bold">Active Constructors</h2>
             <ul>
-              {data.activeConstructors.map((constructor) => {
+              {data.activeConstructors.map(constructor => {
                 return (
                   <li className="my-1 hover:font-bold" key={constructor.name}>
                     <Link to={constructor.constructorId.toString()}>
@@ -82,7 +80,7 @@ export default function ConstructorsPage() {
                 Inactive Constructors
               </summary>
               <ul>
-                {data.inactiveConstructors.map((constructor) => {
+                {data.inactiveConstructors.map(constructor => {
                   return (
                     <li className="my-1 hover:font-bold" key={constructor.name}>
                       <Link to={constructor.constructorId.toString()}>

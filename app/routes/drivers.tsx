@@ -1,12 +1,12 @@
-import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
-import Sidebar from "~/components/Sidebar";
-import { prisma } from "~/db.server";
+import type { LoaderArgs } from '@remix-run/node';
+import { json } from '@remix-run/node';
+import { Link, Outlet, useLoaderData } from '@remix-run/react';
+import Sidebar from '~/components/Sidebar';
+import { prisma } from '~/db.server';
 
 export async function loader({ request }: LoaderArgs) {
   const activeDriverStandings = await prisma.driverStanding.findMany({
-    distinct: ["driverId"],
+    distinct: ['driverId'],
     select: {
       drivers: {
         select: {
@@ -21,7 +21,7 @@ export async function loader({ request }: LoaderArgs) {
     },
     orderBy: {
       drivers: {
-        surname: "asc",
+        surname: 'asc',
       },
     },
     where: {
@@ -31,10 +31,8 @@ export async function loader({ request }: LoaderArgs) {
     },
   });
 
-  const activeDrivers = activeDriverStandings.map(
-    (standing) => standing.drivers
-  );
-  const activeDriverIds = activeDrivers.map((driver) => driver.driverId);
+  const activeDrivers = activeDriverStandings.map(standing => standing.drivers);
+  const activeDriverIds = activeDrivers.map(driver => driver.driverId);
 
   const inactiveDrivers = await prisma.driver.findMany({
     where: {
@@ -53,7 +51,7 @@ export async function loader({ request }: LoaderArgs) {
       code: true,
     },
     orderBy: {
-      surname: "asc",
+      surname: 'asc',
     },
   });
 
@@ -76,7 +74,7 @@ export default function DriversPage() {
           <div className="flex-col">
             <h2 className="mt-4 text-lg font-bold">Active Drivers</h2>
             <ul>
-              {data.activeDrivers.map((driver) => {
+              {data.activeDrivers.map(driver => {
                 return (
                   <li className="my-1 hover:font-bold" key={driver.driverRef}>
                     <Link to={driver.driverId.toString()}>
@@ -94,7 +92,7 @@ export default function DriversPage() {
                 Inactive Drivers
               </summary>
               <ul>
-                {data.inactiveDrivers.map((driver) => {
+                {data.inactiveDrivers.map(driver => {
                   return (
                     <li className="my-1 hover:font-bold" key={driver.driverRef}>
                       <Link to={driver.driverId.toString()}>

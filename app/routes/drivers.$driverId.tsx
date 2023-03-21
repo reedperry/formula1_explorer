@@ -1,12 +1,12 @@
-import type { ActionArgs, LoaderArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, useCatch, useLoaderData } from "@remix-run/react";
-import invariant from "tiny-invariant";
-import { prisma } from "~/db.server";
-import { getDriver } from "~/models/driver.server";
+import type { ActionArgs, LoaderArgs } from '@remix-run/node';
+import { json, redirect } from '@remix-run/node';
+import { Form, useCatch, useLoaderData } from '@remix-run/react';
+import invariant from 'tiny-invariant';
+import { prisma } from '~/db.server';
+import { getDriver } from '~/models/driver.server';
 
 export async function loader({ request, params }: LoaderArgs) {
-  invariant(params.driverId, "driverId not found");
+  invariant(params.driverId, 'driverId not found');
   const driverId = Number.parseInt(params.driverId);
   const driver = await getDriver(driverId);
   if (!driver) {
@@ -23,8 +23,8 @@ export async function loader({ request, params }: LoaderArgs) {
   const wins = await prisma.result.count({
     where: {
       driverId,
-      positionText: '1'
-    }
+      positionText: '1',
+    },
   });
 
   return json({ driver, polePositions, wins });
@@ -37,31 +37,45 @@ export default function DriverDetailsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl mb-2">{driver.forename} {driver.surname} {driver.code ? <span>({driver.code})</span> : null}</h1>
-      <table className="table-auto mb-2">
+      <h1 className="mb-2 text-2xl">
+        {driver.forename} {driver.surname}{' '}
+        {driver.code ? <span>({driver.code})</span> : null}
+      </h1>
+      <table className="mb-2 table-auto">
         <tbody>
           <tr>
-
-            <td className="p-3 border border-slate-700">Born</td>
+            <td className="border border-slate-700 p-3">Born</td>
             {dob ? (
-              <td className="p-3 border border-slate-700">{dob.toLocaleDateString()}</td>
-            ) : <td className="p-3 border border-slate-700"></td>}
+              <td className="border border-slate-700 p-3">
+                {dob.toLocaleDateString()}
+              </td>
+            ) : (
+              <td className="border border-slate-700 p-3"></td>
+            )}
           </tr>
-          {driver.nationality && (<tr>
-            <td className="p-3 border border-slate-700">Nationality</td>
-            <td className="p-3 border border-slate-700">{driver.nationality}</td>
-          </tr>)}
+          {driver.nationality && (
+            <tr>
+              <td className="border border-slate-700 p-3">Nationality</td>
+              <td className="border border-slate-700 p-3">
+                {driver.nationality}
+              </td>
+            </tr>
+          )}
           <tr>
-            <td className="p-3 border border-slate-700">Pole Positions</td>
-            <td className="p-3 border border-slate-700">{data.polePositions}</td>
+            <td className="border border-slate-700 p-3">Pole Positions</td>
+            <td className="border border-slate-700 p-3">
+              {data.polePositions}
+            </td>
           </tr>
           <tr>
-            <td className="p-3 border border-slate-700">Race Wins</td>
-            <td className="p-3 border border-slate-700">{data.wins}</td>
+            <td className="border border-slate-700 p-3">Race Wins</td>
+            <td className="border border-slate-700 p-3">{data.wins}</td>
           </tr>
         </tbody>
       </table>
-      <a href={driver.url} target="_blank" referrerPolicy="no-referrer">Visit {driver.forename} {driver.surname}'s page on Wikipedia</a>
+      <a href={driver.url} target="_blank" referrerPolicy="no-referrer">
+        Visit {driver.forename} {driver.surname}'s page on Wikipedia
+      </a>
     </div>
   );
 }
@@ -69,7 +83,11 @@ export default function DriverDetailsPage() {
 function findDriverDOB(utcDob: string): Date | null {
   if (utcDob) {
     const [YYYY, MM, DD] = utcDob.split('-');
-    return new Date(Number.parseInt(YYYY), Number.parseInt(MM) - 1, Number.parseInt(DD));
+    return new Date(
+      Number.parseInt(YYYY),
+      Number.parseInt(MM) - 1,
+      Number.parseInt(DD)
+    );
   }
   return null;
 }

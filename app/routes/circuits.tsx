@@ -1,8 +1,8 @@
-import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
-import Sidebar from "~/components/Sidebar";
-import { prisma } from "~/db.server";
+import type { LoaderArgs } from '@remix-run/node';
+import { json } from '@remix-run/node';
+import { Form, Link, NavLink, Outlet, useLoaderData } from '@remix-run/react';
+import Sidebar from '~/components/Sidebar';
+import { prisma } from '~/db.server';
 
 export async function loader() {
   const circuits = await prisma.circuit.findMany({
@@ -24,13 +24,13 @@ export async function loader() {
   });
 
   const activeCircuitIds = raceCircuitsThisYear.map(
-    (circuit) => circuit.circuitId
+    circuit => circuit.circuitId
   );
-  const activeCircuits = circuits.filter((circuit) =>
+  const activeCircuits = circuits.filter(circuit =>
     activeCircuitIds.includes(circuit.circuitId)
   );
   const inactiveCircuits = circuits.filter(
-    (circuit) => !activeCircuitIds.includes(circuit.circuitId)
+    circuit => !activeCircuitIds.includes(circuit.circuitId)
   );
 
   return json({ activeCircuits, inactiveCircuits });
@@ -52,7 +52,7 @@ export default function CircuitsPage() {
           <div className="flex-col">
             <h2 className="mt-4 text-lg font-bold">Active Circuits</h2>
             <ul>
-              {data.activeCircuits.map((circuit) => {
+              {data.activeCircuits.map(circuit => {
                 return (
                   <li className="my-1" key={circuit.circuitRef}>
                     <Link to={circuit.circuitId.toString()}>
@@ -69,7 +69,7 @@ export default function CircuitsPage() {
                 Inactive Circuits
               </summary>
               <ul>
-                {data.inactiveCircuits.map((circuit) => {
+                {data.inactiveCircuits.map(circuit => {
                   return (
                     <li className="my-1" key={circuit.circuitRef}>
                       <Link to={circuit.circuitId.toString()}>

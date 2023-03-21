@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -7,7 +7,7 @@ async function seed() {
 }
 
 seed()
-  .catch((e) => {
+  .catch(e => {
     console.error(e);
     process.exit(1);
   })
