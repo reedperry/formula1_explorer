@@ -64,7 +64,7 @@ export default function DriversPage() {
   return (
     <div className="flex h-full min-h-screen w-full flex-col">
       <header className="flex items-center justify-between bg-slate-800 p-4 text-white">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-2xl">
           <Link to=".">Drivers</Link>
         </h1>
       </header>

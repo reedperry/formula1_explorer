@@ -55,7 +55,7 @@ export default function ConstructorsPage() {
   return (
     <div className="h-full min-h-screen w-full flex-col">
       <header className="flex w-full items-center justify-between bg-slate-800 p-4 text-white">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-2xl">
           <Link to=".">Constructors</Link>
         </h1>
       </header>
